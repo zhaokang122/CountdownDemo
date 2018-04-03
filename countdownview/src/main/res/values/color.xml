@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="defaultCircleColor">#efa929</color>
+    <color name="defaultCircleBackgroundColor">#b1a9a6</color>
+    <color name="defaultTextColor">#4e8ca5</color>
+</resources>

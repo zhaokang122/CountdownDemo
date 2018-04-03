@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CountdownView">
+        <attr name="cv_circle_color" format="color|reference" />
+        <attr name="cv_circle_bg_color" format="color|reference" />
+        <attr name="cv_text_color" format="color|reference" />
+        <attr name="cv_circle_width" format="dimension|reference" />
+    </declare-styleable>
+</resources>
