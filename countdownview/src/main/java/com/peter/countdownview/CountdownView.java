@@ -10,6 +10,9 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +36,7 @@ public class CountdownView extends View {
     private int circleBackgroundColor;
     private int circleColor;
     private int textColor;
+    private String pattern = "HH:mm:ss";
 
 
     public CountdownView(Context context) {
@@ -60,6 +64,11 @@ public class CountdownView extends View {
                 getColor(R.styleable.CountdownView_cv_circle_color, ContextCompat.getColor(mContext, R.color.defaultCircleColor));
         textColor = typedArray.
                 getColor(R.styleable.CountdownView_cv_text_color, ContextCompat.getColor(mContext, R.color.defaultTextColor));
+        pattern = typedArray.
+                getString(R.styleable.CountdownView_cv_pattern);
+
+        if (pattern == null || (!pattern.equals("HH:mm:ss") && !pattern.equals("mm:ss")))
+            pattern = "HH:mm:ss";
 
         typedArray.recycle();
     }
@@ -96,10 +105,8 @@ public class CountdownView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        bgRect.set(mWidth / 2 - mRadius,
-                mHeight / 2 - mRadius,
-                mWidth / 2 + mRadius,
-                mHeight / 2 + mRadius);
+        bgRect.set(mWidth / 2 - mRadius, mHeight / 2 - mRadius,
+                mWidth / 2 + mRadius, mHeight / 2 + mRadius);
 
         float section = (currentCount * 1.0f) / maxCount;
         if (section > 1) section = 1;
@@ -129,7 +136,6 @@ public class CountdownView extends View {
 
         //写上字
         String time = getTime(currentCount);
-        time = time.substring(time.indexOf(":") + 1);
         adjustTvTextSize(time, (gearRadius - gearWidth * 2) * 2);
         canvas.drawText(time, mWidth / 2, mHeight / 2 + getFontHeight() / 2, mTextPaint);
     }
@@ -139,13 +145,18 @@ public class CountdownView extends View {
         return (float) Math.ceil(fm.descent - fm.ascent);
     }
 
-    //动态修改字体大小
-    private void adjustTvTextSize(String text, float avaiWidth) {
-        if (avaiWidth <= 0)
+    /**
+     * 动态修改字体大小
+     *
+     * @param text     文本
+     * @param maxWidth 最大宽度
+     */
+    private void adjustTvTextSize(String text, float maxWidth) {
+        if (maxWidth <= 0)
             return;
         float trySize = 200;
         mTextPaint.setTextSize(trySize);
-        while (mTextPaint.measureText(text) > avaiWidth && trySize > 20) {
+        while (mTextPaint.measureText(text) > maxWidth && trySize > 20) {
             trySize--;
             mTextPaint.setTextSize(trySize);
         }
@@ -154,7 +165,7 @@ public class CountdownView extends View {
     /**
      * 获得X轴角度值
      *
-     * @param n 位置值
+     * @param n 位置
      * @return 角度值
      */
     private float getCX(float n, float radius) {
@@ -167,7 +178,7 @@ public class CountdownView extends View {
     /**
      * 获得Y轴角度值
      *
-     * @param n 位置值
+     * @param n 位置
      * @return 角度值
      */
     private float getCY(float n, float radius) {
@@ -246,52 +257,10 @@ public class CountdownView extends View {
      * @param second 秒数
      * @return 返回格式化的字符串
      */
-    private static String getTime(int second) {
-        if (second < 10) {
-            return "00:" + "00:0" + second;
-        }
-        if (second < 60) {
-            return "00:" + "00:" + second;
-        }
-        if (second < 3600) {
-            int minute = second / 60;
-            second = second - minute * 60;
-            if (minute < 10) {
-                if (second < 10) {
-                    return "00:" + "0" + minute + ":0" + second;
-                }
-                return "00:" + "0" + minute + ":" + second;
-            }
-            if (second < 10) {
-                return "00:" + minute + ":0" + second;
-            }
-            return "00:" + minute + ":" + second;
-        }
-        int hour = second / 3600;
-        int minute = (second - hour * 3600) / 60;
-        second = second - hour * 3600 - minute * 60;
-        if (hour < 10) {
-            if (minute < 10) {
-                if (second < 10) {
-                    return "0" + hour + ":0" + minute + ":0" + second;
-                }
-                return "0" + hour + ":0" + minute + ":" + second;
-            }
-            if (second < 10) {
-                return "0" + hour + ":" + minute + ":0" + second;
-            }
-            return "0" + hour + ":" + minute + ":" + second;
-        }
-        if (minute < 10) {
-            if (second < 10) {
-                return hour + ":0" + minute + ":0" + second;
-            }
-            return hour + ":0" + minute + ":" + second;
-        }
-        if (second < 10) {
-            return hour + ":" + minute + ":0" + second;
-        }
-        return hour + ":" + minute + ":" + second;
+    private String getTime(int second) {
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.getDefault());
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+        return formatter.format(second * 1000);
     }
 }
 

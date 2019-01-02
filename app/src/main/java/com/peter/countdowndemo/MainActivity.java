@@ -5,6 +5,9 @@ import android.os.Bundle;
 
 import com.peter.countdownview.CountdownView;
 
+/**
+ * @author Peter
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
